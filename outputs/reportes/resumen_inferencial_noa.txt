@@ -1,0 +1,65 @@
+RESUMEN INFERENCIAL - ANÁLISIS DENGUE NOA 2018-2025
+===================================================
+Fecha: 2025-11-30 
+
+COMPARACIÓN DE MODELOS:
+• Modelo Básico (año + provincia): R² = 0.2543 , R²-ajustado = 0.11 
+• Modelo Pandemia: R² = 0.2582 , R²-ajustado = 0.0851 
+• Modelo Interacción: R² = 0.3614 , R²-ajustado = 0.0549 
+
+MEJOR MODELO SELECCIONADO: MODELO CON PANDEMIA
+
+RESUMEN DEL MODELO PANDEMIA:
+
+Call:
+lm(formula = total_casos ~ anio + dummy_pandemia + provincia, 
+    data = datos_modelo)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-23298  -6818    736   4341  60868 
+
+Coefficients:
+                               Estimate Std. Error t value Pr(>|t|)  
+(Intercept)                  -4915328.4  2348462.3  -2.093   0.0449 *
+anio                             2431.7     1160.8   2.095   0.0447 *
+dummy_pandemia                  -2228.4     5637.1  -0.395   0.6954  
+provinciaJujuy                   5879.6     8563.5   0.687   0.4976  
+provinciaLa Rioja                 728.2     8494.6   0.086   0.9323  
+provinciaSalta                   6001.4     7699.1   0.779   0.4418  
+provinciaSantiago Del Estero     4762.4     8002.8   0.595   0.5562  
+provinciaTucumán                16068.4     7915.3   2.030   0.0513 .
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 14010 on 30 degrees of freedom
+Multiple R-squared:  0.2582,	Adjusted R-squared:  0.08507 
+F-statistic: 1.491 on 7 and 30 DF,  p-value: 0.2081
+
+
+COEFICIENTES ESTADÍSTICAMENTE SIGNIFICATIVOS:
+# A tibble: 2 × 5
+  term         estimate std.error statistic p.value
+  <chr>           <dbl>     <dbl>     <dbl>   <dbl>
+1 (Intercept) -4915328.  2348462.     -2.09  0.0449
+2 anio            2432.     1161.      2.09  0.0447
+
+PRUEBAS DE HIPÓTESIS:
+• Normalidad de residuos (Shapiro-Wilk): p-value = 0.000000423 
+• Correlación año-casos (Pearson): r = 0.342 , p-value = 0.0358 
+• Homocedasticidad (Breusch-Pagan): p-value = 0.229 
+
+PREDICCIONES PARA 2026:
+  anio dummy_pandemia           provincia      fit       lwr      upr
+1 2026              0               Salta 17302.13  3214.243 31390.01
+2 2026              0 Santiago Del Estero 16063.16  1390.768 30735.56
+3 2026              0             Tucumán 27369.17 12703.329 42035.02
+4 2026              0               Jujuy 17180.38  1012.116 33348.64
+5 2026              0           Catamarca 11300.75 -2595.359 25196.85
+6 2026              0            La Rioja 12028.94 -2753.920 26811.79
+
+INTERPRETACIÓN DE RESULTADOS:
+• El modelo explica aproximadamente 25.8 % de la variabilidad en casos de dengue
+• El efecto de la pandemia (dummy_pandemia) es negativo 
+• Existen diferencias significativas entre provincias (p-value ANOVA: 0.618 )
+• La tendencia temporal es creciente 

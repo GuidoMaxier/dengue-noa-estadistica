@@ -1,0 +1,73 @@
+RESUMEN DESCRIPTIVO - ANÁLISIS DENGUE NOA 2018-2025
+===================================================
+Fecha: 2025-11-30 
+
+RESUMEN GENERAL:
+# A tibble: 1 × 9
+  total_casos total_registros años_unicos provincias_unicas departamentos_unicos promedio_casos_por_registro desvio_casos
+        <dbl>           <int>       <int>             <int>                <int>                       <dbl>        <dbl>
+1      242710           17754           8                 6                  125                        13.7         40.9
+# ℹ 2 more variables: fecha_minima <chr>, fecha_maxima <chr>
+
+EVOLUCIÓN ANUAL:
+# A tibble: 8 × 6
+   anio total_casos registros promedio_por_registro variacion_anual proporcion_total
+  <dbl>       <dbl>     <int>                 <dbl>           <dbl>            <dbl>
+1  2018         175        95                  1.84            NA             0.0721
+2  2019        1506       574                  2.62           761.            0.620 
+3  2020       10220      1804                  5.67           579.            4.21  
+4  2021        3360       830                  4.05           -67.1           1.38  
+5  2022         601       159                  3.78           -82.1           0.248 
+6  2023       62033      5617                 11.0          10222.           25.6   
+7  2024      163030      8172                 19.9            163.           67.2   
+8  2025        1785       503                  3.55           -98.9           0.735 
+
+DISTRIBUCIÓN POR PROVINCIA:
+# A tibble: 6 × 5
+  provincia           total_casos porcentaje_total promedio_casos registros
+  <chr>                     <dbl>            <dbl>          <dbl>     <int>
+1 Tucumán                  109313            45.0           21.5       5093
+2 Salta                     46419            19.1            9.59      4839
+3 Santiago Del Estero       34831            14.4           12.3       2838
+4 Jujuy                     25516            10.5           11.7       2188
+5 La Rioja                  14349             5.91          10.8       1329
+6 Catamarca                 12282             5.06           8.37      1467
+
+DISTRIBUCIÓN POR EDAD:
+# A tibble: 28 × 4
+   grupo_edad_agrupado total_casos porcentaje registros
+   <chr>                     <dbl>      <dbl>     <int>
+ 1 De 45 A 65 Años           47929      19.7       1991
+ 2 De 25 A 34 Años           44312      18.3       1986
+ 3 De 35 A 44 Años           36324      15.0       1830
+ 4 De 20 A 24 Años           21018       8.66      1577
+ 5 De 10 A 14 Años           20697       8.53      1404
+ 6 De 15 A 19 Años           20489       8.44      1477
+ 7 De 5 A 9 Años             14897       6.14      1260
+ 8 Mayores De 65 Años        14643       6.03      1350
+ 9 De 2 A 4 Años              4793       1.97       735
+10 De 25 A 34 Anos            2995       1.23       503
+# ℹ 18 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+DISTRIBUCIÓN ESTACIONAL:
+# A tibble: 4 × 3
+  trimestre_epidemio total_casos porcentaje
+  <chr>                    <dbl>      <dbl>
+1 T1 (Ene-Mar)            107148    44.1   
+2 T2 (Abr-Jun)            135044    55.6   
+3 T3 (Jul-Sep)               420     0.173 
+4 T4 (Oct-Dic)                98     0.0404
+
+IMPACTO DE PANDEMIA:
+# A tibble: 8 × 3
+   anio periodo_pandemia total_casos
+  <dbl> <chr>                  <dbl>
+1  2018 Pre-Pandemia             175
+2  2019 Pre-Pandemia            1506
+3  2020 Pandemia               10220
+4  2021 Pandemia                3360
+5  2022 Post-Pandemia            601
+6  2023 Post-Pandemia          62033
+7  2024 Post-Pandemia         163030
+8  2025 Post-Pandemia           1785

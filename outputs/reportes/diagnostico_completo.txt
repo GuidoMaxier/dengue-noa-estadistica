@@ -1,0 +1,82 @@
+REPORTE DE DIAGNÓSTICO - DATASET DENGUE NOA
+============================================
+Fecha análisis: 2025-11-30 
+
+DIMENSIONES: 69362 filas x 10 columnas
+
+VARIABLES DISPONIBLES:
+- departamento_id
+- departamento
+- provincia_id
+- provincia
+- anio
+- semanas_epidemiologicas
+- evento
+- grupo_edad_id
+- grupo_edad
+- cantidad_casos
+
+DISTRIBUCIÓN POR AÑO:
+
+ 2018  2019  2020  2021  2022  2023  2024  2025 
+  885  1271  9895  1163   293 18024 34899  2932 
+
+PROVINCIAS INCLUIDAS:
+- CABA
+- Buenos Aires
+- Mendoza
+- Santa Fe
+- Corrientes
+- Chaco
+- Córdoba
+- Entre Ríos
+- Formosa
+- Misiones
+- Salta
+- Santiago del Estero
+- Tucumán
+- Jujuy
+- Catamarca
+- Chubut
+- La Pampa
+- La Rioja
+- Neuquén
+- Río Negro
+- San Juan
+- San Luis
+- Santa Cruz
+- Tierra del Fuego
+
+TOTAL CASOS POR AÑO:
+# A tibble: 8 × 3
+   anio total_casos registros
+  <dbl>       <dbl>     <int>
+1  2018        1573       885
+2  2019        2791      1271
+3  2020       46411      9895
+4  2021        3990      1163
+5  2022         802       293
+6  2023      146390     18024
+7  2024      555012     34899
+8  2025       17014      2932
+
+TOTAL CASOS POR PROVINCIA:
+# A tibble: 24 × 2
+   provincia           total_casos
+   <chr>                     <dbl>
+ 1 Buenos Aires             127159
+ 2 Córdoba                  119487
+ 3 Tucumán                  109313
+ 4 Santa Fe                  97948
+ 5 Salta                     46419
+ 6 CABA                      44844
+ 7 Chaco                     43703
+ 8 Santiago del Estero       34831
+ 9 Misiones                  26413
+10 Jujuy                     25516
+# ℹ 14 more rows
+# ℹ Use `print(n = ...)` to see more rows
+
+CALIDAD DE DATOS - VALORES MISSING:
+departamento_id 
+              1 

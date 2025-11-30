@@ -1,0 +1,35 @@
+RESUMEN DE LIMPIEZA - DATOS DENGUE NOA
+======================================
+Fecha: 2025-11-30 
+
+FILAS ORIGINALES TOTALES: 69362 
+FILAS FINALES NOA: 17754 
+PORCENTAJE DE DATOS PARA NOA: 25.6 %
+
+PROVINCIAS NOA INCLUIDAS:
+• Tucumán: 109313 casos (45%)
+• Salta: 46419 casos (19.1%)
+• Santiago Del Estero: 34831 casos (14.4%)
+• Jujuy: 25516 casos (10.5%)
+• La Rioja: 14349 casos (5.9%)
+• Catamarca: 12282 casos (5.1%)
+
+VARIABLES DERIVADAS CREADAS:
+- periodo_pandemia
+- dummy_pandemia
+- trimestre_epidemio
+- tiempo_continuo
+- grupo_edad_agrupado
+
+DISTRIBUCIÓN TEMPORAL EN NOA:
+# A tibble: 8 × 3
+   anio periodo_pandemia total_casos
+  <dbl> <chr>                  <dbl>
+1  2018 Pre-Pandemia             175
+2  2019 Pre-Pandemia            1506
+3  2020 Pandemia               10220
+4  2021 Pandemia                3360
+5  2022 Post-Pandemia            601
+6  2023 Post-Pandemia          62033
+7  2024 Post-Pandemia         163030
+8  2025 Post-Pandemia           1785

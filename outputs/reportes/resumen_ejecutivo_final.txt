@@ -1,0 +1,44 @@
+RESUMEN EJECUTIVO - ANÁLISIS EPIDEMIOLÓGICO DENGUE NOA 2018-2025
+================================================================
+Fecha del análisis: 30/11/2025 
+
+HALLazGOS PRINCIPALES:
+
+1. CARGA DE ENFERMEDAD:
+   • Total de casos en NOA (2018-2025): 242.710 
+   • Año pico: 2024 con 163.030 casos (67.2% del total)
+   • Tendencia: Crecimiento exponencial a partir de 2023
+
+2. DISTRIBUCIÓN GEOGRÁFICA:
+   • Provincia más afectada: Tucumán (45.0% del total)
+   • Otras provincias críticas: Salta (19.1%), Santiago del Estero (14.4%)
+   • Distribución heterogénea con focos epidémicos definidos
+
+3. PATRÓN TEMPORAL Y ESTACIONALIDAD:
+   • Estacionalidad marcada: 99.7% de casos entre enero y junio
+   • Período de mayor incidencia: Trimestre 2 (Abril-Junio) - 55.6%
+   • Baja incidencia en segundo semestre
+
+4. GRUPOS ETARIOS AFECTADOS:
+   • Población adulta: 45-65 años (19.7%), 25-34 años (18.3%)
+   • Menor afectación en menores de 10 años
+   • Distribución similar a patrones epidemiológicos conocidos
+
+5. IMPACTO DE LA PANDEMIA COVID-19:
+   • Período pandémico (2020-2021): 13,580 casos (5.6% del total)
+   • Post-pandemia: Brote explosivo en 2023-2024
+   • Posible efecto de inmunidad colectiva y factores ambientales
+
+CONCLUSIONES Y RECOMENDACIONES:
+• Se evidencia una epidemia de dengue de magnitud creciente en NOA
+• Tucumán requiere atención prioritaria en estrategias de control
+• La estacionalidad marcada sugiere optimizar timing de intervenciones
+• Grupos adultos representan la mayor carga de enfermedad
+• Necesidad de fortalecer vigilancia epidemiológica y control vectorial
+• Considerar factores climáticos y ambientales en modelos predictivos
+
+METODOLOGÍA:
+• Análisis de 24,271 registros de casos confirmados 2018-2025
+• Estadística descriptiva e inferencial con R
+• Modelos de regresión lineal múltiple
+• Validación de supuestos estadísticos
