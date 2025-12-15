@@ -16,7 +16,7 @@ resumen_general <- dengue_clean %>%
     total_casos = sum(cantidad_casos, na.rm = TRUE),
     total_registros = n(),
     años_unicos = n_distinct(anio),
-    provincias_unicas = n_distinct(provincia_nombre),
+    provincias_unicas = n_distinct(provincia),
     promedio_casos_por_registro = mean(cantidad_casos, na.rm = TRUE),
     desvio_casos = sd(cantidad_casos, na.rm = TRUE)
   )
@@ -50,7 +50,7 @@ cat("\n3. ANÁLISIS GEOGRÁFICO...\n")
 
 # Por provincia
 casos_provincia <- dengue_clean %>%
-  group_by(provincia_nombre) %>%
+  group_by(provincia) %>%
   summarise(
     total_casos = sum(cantidad_casos),
     porcentaje_total = total_casos / sum(dengue_clean$cantidad_casos) * 100,
@@ -90,7 +90,7 @@ ggsave("outputs/figuras/01_series_temporales/evolucion_anual.png", p_temporal,
        width = 10, height = 6, dpi = 300)
 
 # Casos por provincia
-p_provincia <- ggplot(casos_provincia, aes(x = reorder(provincia_nombre, total_casos), y = total_casos)) +
+p_provincia <- ggplot(casos_provincia, aes(x = reorder(provincia, total_casos), y = total_casos)) +
   geom_col(fill = "coral") +
   coord_flip() +
   labs(title = "Casos de Dengue por Provincia (2018-2025)",

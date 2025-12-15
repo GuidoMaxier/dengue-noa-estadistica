@@ -1,0 +1,50 @@
+RESUMEN DESCRIPTIVO - ANÁLISIS DENGUE NOA
+==========================================
+Fecha: 2025-12-15 
+
+RESUMEN GENERAL:
+# A tibble: 1 × 6
+  total_casos total_registros años_unicos provincias_unicas promedio_casos_por_registro desvio_casos
+        <dbl>           <int>       <int>             <int>                       <dbl>        <dbl>
+1      242710           17754           8                 6                        13.7         40.9
+
+EVOLUCIÓN ANUAL:
+# A tibble: 8 × 5
+   anio total_casos registros promedio_diario variacion_anual
+  <dbl>       <dbl>     <int>           <dbl>           <dbl>
+1  2018         175        95            1.84            NA  
+2  2019        1506       574            2.62           761. 
+3  2020       10220      1804            5.67           579. 
+4  2021        3360       830            4.05           -67.1
+5  2022         601       159            3.78           -82.1
+6  2023       62033      5617           11.0          10222. 
+7  2024      163030      8172           19.9            163. 
+8  2025        1785       503            3.55           -98.9
+
+DISTRIBUCIÓN POR PROVINCIA:
+# A tibble: 6 × 4
+  provincia           total_casos porcentaje_total promedio_casos
+  <chr>                     <dbl>            <dbl>          <dbl>
+1 Tucumán                  109313            45.0           21.5 
+2 Salta                     46419            19.1            9.59
+3 Santiago Del Estero       34831            14.4           12.3 
+4 Jujuy                     25516            10.5           11.7 
+5 La Rioja                  14349             5.91          10.8 
+6 Catamarca                 12282             5.06           8.37
+
+DISTRIBUCIÓN POR EDAD:
+# A tibble: 28 × 3
+   grupo_edad_agrupado total_casos porcentaje
+   <chr>                     <dbl>      <dbl>
+ 1 De 45 A 65 Años           47929      19.7 
+ 2 De 25 A 34 Años           44312      18.3 
+ 3 De 35 A 44 Años           36324      15.0 
+ 4 De 20 A 24 Años           21018       8.66
+ 5 De 10 A 14 Años           20697       8.53
+ 6 De 15 A 19 Años           20489       8.44
+ 7 De 5 A 9 Años             14897       6.14
+ 8 Mayores De 65 Años        14643       6.03
+ 9 De 2 A 4 Años              4793       1.97
+10 De 25 A 34 Anos            2995       1.23
+# ℹ 18 more rows
+# ℹ Use `print(n = ...)` to see more rows
