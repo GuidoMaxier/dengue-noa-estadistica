@@ -1,0 +1,559 @@
+---
+title: "Dashboard Epidemiológico: Dengue en el NOA"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    theme: cosmo
+    source_code: embed
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+# ==============================================================================
+# CONFIGURACIÓN INICIAL DEL DASHBOARD
+# ==============================================================================
+
+# Cargar librerías necesarias
+library(flexdashboard)
+library(tidyverse)
+library(readxl)
+library(plotly)
+library(DT)
+library(viridis)
+library(scales)
+library(shiny)
+
+# Configurar opciones
+options(scipen = 999)
+
+# Cargar datos
+dengue_raw <- read_excel("dengue_2018_2025.xlsx")
+
+# Filtrar y limpiar datos para NOA
+provincias_noa <- c("Salta", "Santiago del Estero", "Tucumán", "Jujuy", "Catamarca", "La Rioja")
+
+dengue_clean <- dengue_raw %>%
+  filter(provincia %in% provincias_noa) %>%
+  filter(!is.na(cantidad_casos) & cantidad_casos >= 0) %>%
+  mutate(
+    provincia = str_to_title(provincia),
+    departamento = str_to_title(departamento),
+    periodo_pandemia = case_when(
+      anio %in% 2020:2021 ~ "Pandemia",
+      anio < 2020 ~ "Pre-Pandemia",
+      anio > 2021 ~ "Post-Pandemia"
+    ),
+    trimestre_epidemio = case_when(
+      semanas_epidemiologicas <= 13 ~ "T1 (Ene-Mar)",
+      semanas_epidemiologicas <= 26 ~ "T2 (Abr-Jun)",
+      semanas_epidemiologicas <= 39 ~ "T3 (Jul-Sep)",
+      TRUE ~ "T4 (Oct-Dic)"
+    ),
+    grupo_edad_agrupado = case_when(
+      str_detect(grupo_edad, "0-4|5-9") ~ "0-9 años",
+      str_detect(grupo_edad, "10-14|15-19") ~ "10-19 años",
+      str_detect(grupo_edad, "20-29|30-39") ~ "20-39 años",
+      str_detect(grupo_edad, "40-49|50-59") ~ "40-59 años",
+      str_detect(grupo_edad, "60-69|70-79|80\\+") ~ "60+ años",
+      TRUE ~ grupo_edad
+    )
+  )
+
+# Preparar datos agregados
+casos_anio <- dengue_clean %>%
+  group_by(anio) %>%
+  summarise(total_casos = sum(cantidad_casos))
+
+casos_provincia <- dengue_clean %>%
+  group_by(provincia) %>%
+  summarise(
+    total_casos = sum(cantidad_casos),
+    porcentaje = round(total_casos / sum(dengue_clean$cantidad_casos) * 100, 1)
+  ) %>%
+  arrange(desc(total_casos))
+
+casos_edad <- dengue_clean %>%
+  group_by(grupo_edad_agrupado) %>%
+  summarise(total_casos = sum(cantidad_casos)) %>%
+  arrange(desc(total_casos))
+```
+
+Resumen General
+=====================================
+
+Column {data-width=250}
+-----------------------------------------------------------------------
+
+### Total de Casos (2018-2025)
+
+```{r}
+total_casos <- sum(dengue_clean$cantidad_casos)
+valueBox(format(total_casos, big.mark = "."), 
+         icon = "fa-virus", 
+         color = "danger")
+```
+
+### Provincias Analizadas
+
+```{r}
+n_provincias <- n_distinct(dengue_clean$provincia)
+valueBox(n_provincias, 
+         icon = "fa-map-marked-alt", 
+         color = "info")
+```
+
+### Año Pico
+
+```{r}
+anio_pico <- casos_anio %>% 
+  filter(total_casos == max(total_casos)) %>% 
+  pull(anio)
+valueBox(anio_pico, 
+         icon = "fa-chart-line", 
+         color = "warning")
+```
+
+### Casos en Año Pico
+
+```{r}
+casos_pico <- max(casos_anio$total_casos)
+valueBox(format(casos_pico, big.mark = "."), 
+         icon = "fa-exclamation-triangle", 
+         color = "danger")
+```
+
+Column {data-width=750}
+-----------------------------------------------------------------------
+
+### Evolución Temporal de Casos de Dengue en el NOA (2018-2025)
+
+```{r}
+p <- plot_ly(casos_anio, x = ~anio, y = ~total_casos, type = 'scatter', mode = 'lines+markers',
+             line = list(color = 'steelblue', width = 3),
+             marker = list(size = 10, color = 'darkblue'),
+             text = ~paste0("Año: ", anio, "<br>Casos: ", format(total_casos, big.mark = ".")),
+             hoverinfo = 'text') %>%
+  layout(
+    xaxis = list(title = "Año"),
+    yaxis = list(title = "Total de Casos"),
+    hovermode = 'closest'
+  )
+p
+```
+
+### Top 5 Provincias Más Afectadas
+
+```{r}
+top5_prov <- casos_provincia %>% head(5)
+
+plot_ly(top5_prov, x = ~total_casos, y = ~reorder(provincia, total_casos), 
+        type = 'bar', orientation = 'h',
+        marker = list(color = ~total_casos, colorscale = 'Reds'),
+        text = ~paste0(format(total_casos, big.mark = "."), " (", porcentaje, "%)"),
+        textposition = 'outside',
+        hoverinfo = 'text') %>%
+  layout(
+    xaxis = list(title = "Total de Casos"),
+    yaxis = list(title = ""),
+    showlegend = FALSE
+  )
+```
+
+Análisis Temporal
+=====================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Casos por Año y Provincia
+
+```{r}
+datos_heatmap <- dengue_clean %>%
+  group_by(anio, provincia) %>%
+  summarise(total_casos = sum(cantidad_casos), .groups = 'drop')
+
+plot_ly(datos_heatmap, x = ~anio, y = ~provincia, z = ~total_casos, 
+        type = "heatmap", colorscale = "Viridis",
+        text = ~paste0("Año: ", anio, "<br>Provincia: ", provincia, "<br>Casos: ", format(total_casos, big.mark = ".")),
+        hoverinfo = 'text') %>%
+  layout(
+    xaxis = list(title = "Año"),
+    yaxis = list(title = "Provincia")
+  )
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Estacionalidad por Semana Epidemiológica
+
+```{r}
+datos_estacional <- dengue_clean %>%
+  group_by(semanas_epidemiologicas) %>%
+  summarise(total_casos = sum(cantidad_casos))
+
+plot_ly(datos_estacional, x = ~semanas_epidemiologicas, y = ~total_casos, 
+        type = 'scatter', mode = 'lines', fill = 'tozeroy',
+        line = list(color = 'coral', width = 2),
+        fillcolor = 'rgba(255, 127, 80, 0.3)',
+        text = ~paste0("Semana: ", semanas_epidemiologicas, "<br>Casos: ", format(total_casos, big.mark = ".")),
+        hoverinfo = 'text') %>%
+  layout(
+    xaxis = list(title = "Semana Epidemiológica"),
+    yaxis = list(title = "Total de Casos Acumulados")
+  )
+```
+
+### Casos por Trimestre Epidemiológico
+
+```{r}
+datos_trimestre <- dengue_clean %>%
+  group_by(trimestre_epidemio) %>%
+  summarise(total_casos = sum(cantidad_casos)) %>%
+  mutate(porcentaje = round(total_casos / sum(total_casos) * 100, 1))
+
+plot_ly(datos_trimestre, labels = ~trimestre_epidemio, values = ~total_casos, 
+        type = 'pie',
+        textinfo = 'label+percent',
+        marker = list(colors = c('#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3')),
+        hoverinfo = 'text',
+        text = ~paste0(trimestre_epidemio, "<br>", format(total_casos, big.mark = "."), " casos")) %>%
+  layout(showlegend = TRUE)
+```
+
+Distribución Geográfica
+=====================================
+
+Column {data-width=600}
+-----------------------------------------------------------------------
+
+### Distribución de Casos por Provincia
+
+```{r}
+plot_ly(casos_provincia, x = ~reorder(provincia, total_casos), y = ~total_casos, 
+        type = 'bar',
+        marker = list(color = ~total_casos, colorscale = 'Blues', showscale = TRUE),
+        text = ~paste0(format(total_casos, big.mark = "."), "<br>(", porcentaje, "%)"),
+        textposition = 'outside',
+        hoverinfo = 'text',
+        hovertext = ~paste0("Provincia: ", provincia, "<br>Casos: ", format(total_casos, big.mark = "."), "<br>Porcentaje: ", porcentaje, "%")) %>%
+  layout(
+    xaxis = list(title = ""),
+    yaxis = list(title = "Total de Casos"),
+    showlegend = FALSE
+  )
+```
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+
+### Tabla Detallada por Provincia
+
+```{r}
+tabla_provincia <- casos_provincia %>%
+  mutate(
+    total_casos = format(total_casos, big.mark = "."),
+    porcentaje = paste0(porcentaje, "%")
+  ) %>%
+  rename(
+    Provincia = provincia,
+    `Total Casos` = total_casos,
+    `Porcentaje` = porcentaje
+  )
+
+datatable(tabla_provincia, 
+          options = list(pageLength = 10, dom = 't'),
+          rownames = FALSE,
+          class = 'cell-border stripe')
+```
+
+### Top 10 Departamentos
+
+```{r}
+top_departamentos <- dengue_clean %>%
+  group_by(departamento, provincia) %>%
+  summarise(total_casos = sum(cantidad_casos), .groups = 'drop') %>%
+  arrange(desc(total_casos)) %>%
+  head(10) %>%
+  mutate(
+    total_casos_fmt = format(total_casos, big.mark = ".")
+  ) %>%
+  select(Departamento = departamento, Provincia = provincia, `Total Casos` = total_casos_fmt)
+
+datatable(top_departamentos, 
+          options = list(pageLength = 10, dom = 't'),
+          rownames = FALSE,
+          class = 'cell-border stripe')
+```
+
+Grupos Etarios
+=====================================
+
+Column {data-width=600}
+-----------------------------------------------------------------------
+
+### Distribución por Grupo Etario
+
+```{r}
+plot_ly(casos_edad, x = ~reorder(grupo_edad_agrupado, total_casos), y = ~total_casos, 
+        type = 'bar',
+        marker = list(color = 'steelblue'),
+        text = ~format(total_casos, big.mark = "."),
+        textposition = 'outside',
+        hoverinfo = 'text',
+        hovertext = ~paste0("Grupo: ", grupo_edad_agrupado, "<br>Casos: ", format(total_casos, big.mark = "."))) %>%
+  layout(
+    xaxis = list(title = "Grupo Etario"),
+    yaxis = list(title = "Total de Casos")
+  )
+```
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+
+### Casos por Edad y Provincia
+
+```{r}
+datos_edad_prov <- dengue_clean %>%
+  group_by(grupo_edad_agrupado, provincia) %>%
+  summarise(total_casos = sum(cantidad_casos), .groups = 'drop')
+
+plot_ly(datos_edad_prov, x = ~grupo_edad_agrupado, y = ~total_casos, 
+        color = ~provincia, type = 'bar',
+        colors = 'Set2',
+        hoverinfo = 'text',
+        text = ~paste0("Provincia: ", provincia, "<br>Grupo: ", grupo_edad_agrupado, "<br>Casos: ", format(total_casos, big.mark = "."))) %>%
+  layout(
+    xaxis = list(title = "Grupo Etario", tickangle = -45),
+    yaxis = list(title = "Total de Casos"),
+    barmode = 'stack',
+    legend = list(title = list(text = 'Provincia'))
+  )
+```
+
+### Tabla por Grupo Etario
+
+```{r}
+tabla_edad <- casos_edad %>%
+  mutate(
+    porcentaje = round(total_casos / sum(total_casos) * 100, 1),
+    total_casos = format(total_casos, big.mark = "."),
+    porcentaje = paste0(porcentaje, "%")
+  ) %>%
+  rename(
+    `Grupo Etario` = grupo_edad_agrupado,
+    `Total Casos` = total_casos,
+    `Porcentaje` = porcentaje
+  )
+
+datatable(tabla_edad, 
+          options = list(pageLength = 10, dom = 't'),
+          rownames = FALSE,
+          class = 'cell-border stripe')
+```
+
+Impacto Pandemia
+=====================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Casos por Período Pandémico
+
+```{r}
+datos_pandemia <- dengue_clean %>%
+  group_by(periodo_pandemia) %>%
+  summarise(total_casos = sum(cantidad_casos)) %>%
+  mutate(porcentaje = round(total_casos / sum(total_casos) * 100, 1))
+
+plot_ly(datos_pandemia, labels = ~periodo_pandemia, values = ~total_casos, 
+        type = 'pie',
+        marker = list(colors = c('#66c2a5', '#fc8d62', '#8da0cb')),
+        textinfo = 'label+percent',
+        hoverinfo = 'text',
+        text = ~paste0(periodo_pandemia, "<br>", format(total_casos, big.mark = "."), " casos")) %>%
+  layout(
+    title = "Distribución de Casos por Período"
+  )
+```
+
+### Evolución por Provincia y Período
+
+```{r}
+datos_prov_pandemia <- dengue_clean %>%
+  group_by(provincia, periodo_pandemia) %>%
+  summarise(total_casos = sum(cantidad_casos), .groups = 'drop')
+
+plot_ly(datos_prov_pandemia, x = ~provincia, y = ~total_casos, 
+        color = ~periodo_pandemia, type = 'bar',
+        colors = c('#66c2a5', '#fc8d62', '#8da0cb'),
+        hoverinfo = 'text',
+        text = ~paste0("Provincia: ", provincia, "<br>Período: ", periodo_pandemia, "<br>Casos: ", format(total_casos, big.mark = "."))) %>%
+  layout(
+    xaxis = list(title = "", tickangle = -45),
+    yaxis = list(title = "Total de Casos"),
+    barmode = 'group',
+    legend = list(title = list(text = 'Período'))
+  )
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Serie Temporal por Provincia
+
+```{r}
+datos_serie_prov <- dengue_clean %>%
+  group_by(anio, provincia) %>%
+  summarise(total_casos = sum(cantidad_casos), .groups = 'drop')
+
+plot_ly(datos_serie_prov, x = ~anio, y = ~total_casos, 
+        color = ~provincia, type = 'scatter', mode = 'lines+markers',
+        colors = 'Set2',
+        line = list(width = 2),
+        marker = list(size = 8),
+        hoverinfo = 'text',
+        text = ~paste0("Año: ", anio, "<br>Provincia: ", provincia, "<br>Casos: ", format(total_casos, big.mark = "."))) %>%
+  layout(
+    xaxis = list(title = "Año"),
+    yaxis = list(title = "Total de Casos"),
+    legend = list(title = list(text = 'Provincia'))
+  )
+```
+
+### Comparación Pre vs Post Pandemia
+
+```{r}
+comparacion <- dengue_clean %>%
+  filter(periodo_pandemia != "Pandemia") %>%
+  group_by(periodo_pandemia, provincia) %>%
+  summarise(total_casos = sum(cantidad_casos), .groups = 'drop') %>%
+  pivot_wider(names_from = periodo_pandemia, values_from = total_casos) %>%
+  mutate(
+    incremento = `Post-Pandemia` - `Pre-Pandemia`,
+    incremento_pct = round((incremento / `Pre-Pandemia`) * 100, 1)
+  ) %>%
+  arrange(desc(incremento_pct))
+
+plot_ly(comparacion, x = ~reorder(provincia, incremento_pct), y = ~incremento_pct, 
+        type = 'bar',
+        marker = list(color = ~incremento_pct, colorscale = 'RdYlGn', reversescale = TRUE),
+        text = ~paste0(incremento_pct, "%"),
+        textposition = 'outside',
+        hoverinfo = 'text',
+        hovertext = ~paste0("Provincia: ", provincia, "<br>Incremento: ", incremento_pct, "%")) %>%
+  layout(
+    xaxis = list(title = ""),
+    yaxis = list(title = "Incremento Porcentual (%)"),
+    showlegend = FALSE
+  )
+```
+
+Datos Interactivos
+=====================================
+
+Column {data-width=1000}
+-----------------------------------------------------------------------
+
+### Explorador de Datos Completo
+
+```{r}
+tabla_completa <- dengue_clean %>%
+  select(
+    Año = anio,
+    Provincia = provincia,
+    Departamento = departamento,
+    `Semana Epidemiológica` = semanas_epidemiologicas,
+    `Grupo Etario` = grupo_edad_agrupado,
+    `Cantidad Casos` = cantidad_casos,
+    `Período Pandemia` = periodo_pandemia,
+    Trimestre = trimestre_epidemio
+  ) %>%
+  arrange(desc(Año), Provincia)
+
+datatable(tabla_completa, 
+          filter = 'top',
+          options = list(
+            pageLength = 25,
+            scrollX = TRUE,
+            autoWidth = TRUE
+          ),
+          rownames = FALSE,
+          class = 'cell-border stripe hover')
+```
+
+Acerca de
+=====================================
+
+Column {data-width=1000}
+-----------------------------------------------------------------------
+
+### 📊 Dashboard Epidemiológico de Dengue en el NOA
+
+**Período de Análisis:** 2018-2025
+
+**Provincias Incluidas:**
+- Salta
+- Santiago del Estero
+- Tucumán
+- Jujuy
+- Catamarca
+- La Rioja
+
+---
+
+#### 🎯 Objetivo
+
+Este dashboard interactivo presenta un análisis epidemiológico completo de los casos de dengue en la región del Noroeste Argentino (NOA) durante el período 2018-2025.
+
+---
+
+#### 📈 Contenido del Dashboard
+
+1. **Resumen General**: Indicadores clave y evolución temporal
+2. **Análisis Temporal**: Patrones estacionales y tendencias
+3. **Distribución Geográfica**: Casos por provincia y departamento
+4. **Grupos Etarios**: Análisis demográfico de casos
+5. **Impacto Pandemia**: Comparación pre/durante/post COVID-19
+6. **Datos Interactivos**: Explorador completo de datos
+
+---
+
+#### 🔧 Tecnologías Utilizadas
+
+- **R**: Lenguaje de programación estadística
+- **Flexdashboard**: Framework para dashboards interactivos
+- **Plotly**: Visualizaciones interactivas
+- **DT**: Tablas interactivas
+- **Tidyverse**: Manipulación y análisis de datos
+
+---
+
+#### 📝 Cómo Usar Este Dashboard
+
+1. **Navegación**: Use las pestañas superiores para explorar diferentes secciones
+2. **Interactividad**: Pase el mouse sobre los gráficos para ver detalles
+3. **Filtros**: En la pestaña "Datos Interactivos" puede filtrar y buscar información específica
+4. **Zoom**: Haga clic y arrastre en los gráficos para hacer zoom
+
+---
+
+#### 📧 Información del Proyecto
+
+**Proyecto**: Análisis Estadístico de Dengue en el NOA  
+**Fecha**: Diciembre 2025  
+**Fuente de Datos**: Sistema de Vigilancia Epidemiológica
+
+---
+
+#### ⚠️ Nota Importante
+
+Este dashboard se genera automáticamente desde los datos. Para actualizarlo:
+
+```r
+# En R, ejecute:
+rmarkdown::render("dashboard_dengue.Rmd")
+```
+
+El archivo HTML resultante se puede abrir en cualquier navegador web.
